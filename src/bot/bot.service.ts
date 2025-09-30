@@ -1,11 +1,17 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Telegraf, Context } from 'telegraf';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Message } from './message.entity';
 
 @Injectable()
 export class BotService implements OnModuleInit {
   private bot: Telegraf;
 
-  constructor() {
+  constructor(
+    @InjectRepository(Message)
+    private messageRepository: Repository<Message>,
+  ) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN as string);
   }
 
@@ -13,6 +19,16 @@ export class BotService implements OnModuleInit {
     this.bot.on('message', async (ctx: Context) => {
       if (ctx.message && 'message_id' in ctx.message && 'chat' in ctx.message) {
         const channelId: string = process.env.TELEGRAM_CHANNEL_ID as string;
+        const newMessage = this.messageRepository.create({
+          userId: ctx.message.from?.id.toString() || '',
+          username: ctx.message.from?.username || ctx.message.from?.first_name || "Noma'lum",
+          text: 'text' in ctx.message ? ctx.message.text || '' : '',
+          chatId: ctx.message.chat.id.toString(),
+          timestamp: new Date(),
+        });
+
+        await this.messageRepository.save(newMessage);
+
         try {
           await ctx.telegram.forwardMessage(channelId, ctx.message.chat.id, ctx.message.message_id);
         } catch (err) {
@@ -23,5 +39,26 @@ export class BotService implements OnModuleInit {
 
     this.bot.launch();
     console.log('Telegram bot ishga tushdi');
+  }
+
+  async getMessages(): Promise<Message[]> {
+    return this.messageRepository.find();
+  }
+
+  async sendSingleMessageToChannel(channelId: string, messageData: any): Promise<void> {
+    const formattedMessage = `
+ID: <b>${messageData.id}</b>
+Foydalanuvchi ID: <b>${messageData.userId}</b>
+Username: <b>${messageData.username}</b>
+Xabar: <b>${messageData.text}</b>
+Chat ID: <b>${messageData.chatId}</b>
+Vaqt: <b>${messageData.timestamp}</b>
+    `;
+
+    try {
+      await this.bot.telegram.sendMessage(channelId, formattedMessage, { parse_mode: 'HTML' });
+    } catch (err) {
+      console.error('Kanalga xabar yuborishda xatolik:', err);
+    }
   }
 }

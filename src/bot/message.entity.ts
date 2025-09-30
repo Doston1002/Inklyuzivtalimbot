@@ -1,22 +1,22 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Entity()
-export class Message {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
+@Schema()
+export class Message extends Document {
+  @Prop({ required: true })
   userId: string;
 
-  @Column()
+  @Prop({ required: true })
   username: string;
 
-  @Column()
+  @Prop({ required: true })
   text: string;
 
-  @Column()
+  @Prop({ required: true })
   chatId: string;
 
-  @Column()
+  @Prop({ type: Date, default: Date.now })
   timestamp: Date;
 }
+
+export const MessageSchema = SchemaFactory.createForClass(Message);

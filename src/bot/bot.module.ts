@@ -1,18 +1,13 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { BotService } from './bot.service';
 import { BotController } from './bot.controller';
-import { Message } from './message.entity';
+import { Message, MessageSchema } from './message.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'bot.db',
-      entities: [Message],
-      synchronize: true, // Productionda false qilish tavsiya etiladi
-    }),
-    TypeOrmModule.forFeature([Message]),
+    MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/inklyuziv_talim'),
+    MongooseModule.forFeature([{ name: Message.name, schema: MessageSchema }]),
   ],
   providers: [BotService],
   controllers: [BotController],

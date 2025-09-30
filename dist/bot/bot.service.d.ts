@@ -1,11 +1,11 @@
 import { OnModuleInit } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Model } from 'mongoose';
 import { Message } from './message.entity';
 export declare class BotService implements OnModuleInit {
-    private messageRepository;
+    private messageModel;
     private bot;
-    constructor(messageRepository: Repository<Message>);
-    onModuleInit(): void;
+    constructor(messageModel: Model<Message>);
+    onModuleInit(): Promise<void>;
     getMessages(): Promise<Message[]>;
     sendSingleMessageToChannel(channelId: string, messageData: any): Promise<void>;
 }

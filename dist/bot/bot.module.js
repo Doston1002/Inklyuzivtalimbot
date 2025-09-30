@@ -8,7 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BotModule = void 0;
 const common_1 = require("@nestjs/common");
-const typeorm_1 = require("@nestjs/typeorm");
+const mongoose_1 = require("@nestjs/mongoose");
 const bot_service_1 = require("./bot.service");
 const bot_controller_1 = require("./bot.controller");
 const message_entity_1 = require("./message.entity");
@@ -17,13 +17,8 @@ let BotModule = class BotModule {
 BotModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forRoot({
-                type: 'sqlite',
-                database: 'bot.db',
-                entities: [message_entity_1.Message],
-                synchronize: true,
-            }),
-            typeorm_1.TypeOrmModule.forFeature([message_entity_1.Message]),
+            mongoose_1.MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/inklyuziv_talim'),
+            mongoose_1.MongooseModule.forFeature([{ name: message_entity_1.Message.name, schema: message_entity_1.MessageSchema }]),
         ],
         providers: [bot_service_1.BotService],
         controllers: [bot_controller_1.BotController],

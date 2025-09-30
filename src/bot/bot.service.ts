@@ -1,25 +1,22 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Telegraf, Context } from 'telegraf';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { Message } from './message.entity';
 
 @Injectable()
 export class BotService implements OnModuleInit {
   private bot: Telegraf;
 
-  constructor(
-    @InjectRepository(Message)
-    private messageRepository: Repository<Message>,
-  ) {
+  constructor(@InjectModel(Message.name) private messageModel: Model<Message>) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN as string);
   }
 
-  onModuleInit() {
+  async onModuleInit() {
     this.bot.on('message', async (ctx: Context) => {
       if (ctx.message && 'message_id' in ctx.message && 'chat' in ctx.message) {
         const channelId: string = process.env.TELEGRAM_CHANNEL_ID as string;
-        const newMessage = this.messageRepository.create({
+        const newMessage = new this.messageModel({
           userId: ctx.message.from?.id.toString() || '',
           username: ctx.message.from?.username || ctx.message.from?.first_name || "Noma'lum",
           text: 'text' in ctx.message ? ctx.message.text || '' : '',
@@ -27,7 +24,7 @@ export class BotService implements OnModuleInit {
           timestamp: new Date(),
         });
 
-        await this.messageRepository.save(newMessage);
+        await newMessage.save();
 
         try {
           await ctx.telegram.forwardMessage(channelId, ctx.message.chat.id, ctx.message.message_id);
@@ -42,7 +39,7 @@ export class BotService implements OnModuleInit {
   }
 
   async getMessages(): Promise<Message[]> {
-    return this.messageRepository.find();
+    return this.messageModel.find().exec();
   }
 
   async sendSingleMessageToChannel(channelId: string, messageData: any): Promise<void> {

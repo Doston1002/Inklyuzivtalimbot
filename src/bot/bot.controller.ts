@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { BotService } from './bot.service';
-import { Message } from './message.entity';
 
 @Controller('bot')
 export class BotController {
@@ -12,7 +11,7 @@ export class BotController {
   }
 
   @Get('messages')
-  async getMessages(): Promise<Message[]> {
+  async getMessages() {
     return this.botService.getMessages();
   }
 

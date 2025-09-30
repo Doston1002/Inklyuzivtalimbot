@@ -9,36 +9,34 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Message = void 0;
-const typeorm_1 = require("typeorm");
-let Message = class Message {
+exports.MessageSchema = exports.Message = void 0;
+const mongoose_1 = require("@nestjs/mongoose");
+const mongoose_2 = require("mongoose");
+let Message = class Message extends mongoose_2.Document {
 };
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)(),
-    __metadata("design:type", Number)
-], Message.prototype, "id", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Message.prototype, "userId", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Message.prototype, "username", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Message.prototype, "text", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Message.prototype, "chatId", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, mongoose_1.Prop)({ type: Date, default: Date.now }),
     __metadata("design:type", Date)
 ], Message.prototype, "timestamp", void 0);
 Message = __decorate([
-    (0, typeorm_1.Entity)()
+    (0, mongoose_1.Schema)()
 ], Message);
 exports.Message = Message;
+exports.MessageSchema = mongoose_1.SchemaFactory.createForClass(Message);
 //# sourceMappingURL=message.entity.js.map
